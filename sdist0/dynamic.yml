@@ -1,0 +1,44 @@
+tls:
+  certificates:
+    - certFile: /certs/server.crt
+      keyFile: /certs/server.key
+  options:
+    default:
+      minVersion: VersionTLS12
+
+http:
+  routers:
+    # Público: solo lectura (GET)
+    publico:
+      entryPoints: [publico]
+      rule: Method(`GET`)
+      service: prueba
+      tls: {}
+
+    # Privado: todos los métodos
+    privado:
+      entryPoints: [privado]
+      rule: PathPrefix(`/`)
+      service: prueba
+      tls: {}
+
+    # Dashboard de Traefik, solo por la entrada privada
+    dashboard:
+      entryPoints: [privado]
+      rule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+      service: api@internal
+      priority: 100
+      tls: {}
+
+  services:
+    prueba:
+      loadBalancer:
+        servers:
+          - url: http://prueba:80
+
+# Rutas finales (cuando existan los servicios):
+#   publico: PathPrefix(`/catalogo`) && Method(`GET`) -> libros-prestamos en sdist1 y sdist2 (balanceado)
+#   privado: /alumnos y /usuarios -> personas (sdist1)
+#            /libros y /prestamos -> libros-prestamos (solo sdist1)
+#            /informes            -> informes (sdist2)
+#   Cada loadBalancer con healthCheck para sacar de rotación una instancia caída.

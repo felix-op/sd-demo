@@ -1,0 +1,34 @@
+# sdist0: solo Traefik (balanceador y puerta de entrada). Todo va por TLS.
+# Antes de levantar: ./sdist0/gen-certs.sh
+# Entradas:
+#   :80    redirige a :443
+#   :443   publico  -> lo que ven los alumnos de afuera
+#   :8443  privado  -> backoffice y dashboard (https://<host>:8443/dashboard/)
+services:
+  traefik:
+    image: traefik:v3.6
+    restart: unless-stopped
+    command:
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=publico
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.publico.address=:443
+      - --entrypoints.privado.address=:8443
+      - --api.dashboard=true
+      - --providers.file.filename=/etc/traefik/dynamic.yml
+      - --providers.file.watch=true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8443:8443"
+    volumes:
+      - ./sdist0/dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - ./sdist0/certs:/certs:ro
+
+  # Backend de prueba, solo para verificar el enrutamiento. Se elimina cuando
+  # las rutas apunten a los servicios reales de sdist1 y sdist2.
+  prueba:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - ./sdist0/index.html:/usr/share/nginx/html/index.html:ro
