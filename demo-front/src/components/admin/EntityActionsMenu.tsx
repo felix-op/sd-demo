@@ -46,8 +46,22 @@ export function EntityActionsMenu({ onView, onEdit, onDelete }: EntityActionsMen
   }
 
   return (
-    <Dropdown menu={{ items, onClick: handleMenuClick }} trigger={["click"]}>
-      <Button type="text" icon={<MoreOutlined style={{ fontSize: 20 }} />} onClick={(event) => event.stopPropagation()} />
-    </Dropdown>
+    <>
+      {/* antd fuerza fondo rojo sólido + texto blanco en el hover de "Eliminar"; lo suavizamos */}
+      <style>{`
+        .entity-actions-dropdown .ant-dropdown-menu-item-danger:hover,
+        .entity-actions-dropdown .ant-dropdown-menu-item-danger.ant-dropdown-menu-item-active {
+          background-color: #f0d2cb !important;
+          color: #ff4d4f !important;
+        }
+      `}</style>
+      <Dropdown
+        menu={{ items, onClick: handleMenuClick }}
+        trigger={["click"]}
+        classNames={{ root: "entity-actions-dropdown" }}
+      >
+        <Button type="text" icon={<MoreOutlined style={{ fontSize: 20 }} />} onClick={(event) => event.stopPropagation()} />
+      </Dropdown>
+    </>
   );
 }

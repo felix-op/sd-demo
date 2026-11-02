@@ -16,18 +16,19 @@ import {
   CloseOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
+import { PALETTE } from "@/components/app-theme-provider";
 import { AdminHeaderProvider, useAdminHeaderContext } from "@/components/admin/admin-header-context";
 
 const { Sider, Content } = Layout;
 const { useBreakpoint } = Grid;
 
 const NAV_ITEMS = [
-  { key: "/admin", icon: <DashboardOutlined style={{ fontSize: 18 }} />, label: <Link href="/admin">Resumen</Link> },
-  { key: "/admin/usuarios", icon: <UserOutlined style={{ fontSize: 18 }} />, label: <Link href="/admin/usuarios">Usuarios</Link> },
-  { key: "/admin/libros", icon: <BookOutlined style={{ fontSize: 18 }} />, label: <Link href="/admin/libros">Libros</Link> },
-  { key: "/admin/alumnos", icon: <TeamOutlined style={{ fontSize: 18 }} />, label: <Link href="/admin/alumnos">Alumnos</Link> },
-  { key: "/admin/prestamos", icon: <SwapOutlined style={{ fontSize: 18 }} />, label: <Link href="/admin/prestamos">Préstamos</Link> },
-  { key: "/admin/informes", icon: <BarChartOutlined style={{ fontSize: 18 }} />, label: <Link href="/admin/informes">Informes</Link> },
+  { key: "/admin", icon: <DashboardOutlined style={{ fontSize: 22 }} />, label: <Link href="/admin">Resumen</Link> },
+  { key: "/admin/usuarios", icon: <UserOutlined style={{ fontSize: 22 }} />, label: <Link href="/admin/usuarios">Usuarios</Link> },
+  { key: "/admin/libros", icon: <BookOutlined style={{ fontSize: 22 }} />, label: <Link href="/admin/libros">Libros</Link> },
+  { key: "/admin/alumnos", icon: <TeamOutlined style={{ fontSize: 22 }} />, label: <Link href="/admin/alumnos">Alumnos</Link> },
+  { key: "/admin/prestamos", icon: <SwapOutlined style={{ fontSize: 22 }} />, label: <Link href="/admin/prestamos">Préstamos</Link> },
+  { key: "/admin/informes", icon: <BarChartOutlined style={{ fontSize: 22 }} />, label: <Link href="/admin/informes">Informes</Link> },
 ];
 
 function AdminTopBar({ onToggleMenu }: { onToggleMenu: () => void }) {
@@ -38,13 +39,13 @@ function AdminTopBar({ onToggleMenu }: { onToggleMenu: () => void }) {
   const hasCreate = Boolean(options.onCreate);
 
   return (
-    <div style={{ background: "#fff", borderBottom: "1px solid #f0f0f0" }}>
+    <div style={{ background: PALETTE.card, borderBottom: `1px solid ${PALETTE.border}` }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px" }}>
         <Avatar
           shape="circle"
           icon={<MenuOutlined style={{ fontSize: 16 }} />}
           onClick={onToggleMenu}
-          style={{ cursor: "pointer", background: "#f0f0f0", color: "rgba(0,0,0,0.85)", flexShrink: 0 }}
+          style={{ cursor: "pointer", background: PALETTE.cream, color: PALETTE.forest, flexShrink: 0 }}
         />
         <span
           style={{
@@ -137,9 +138,10 @@ function AdminShell({ children }: { children: React.ReactNode }) {
   const menu = (
     <Menu
       mode="inline"
+      theme="dark"
       selectedKeys={[pathname]}
       items={NAV_ITEMS}
-      style={{ borderInlineEnd: "none" }}
+      style={{ borderInlineEnd: "none", padding: "12px 0" }}
       onClick={() => setDrawerOpen(false)}
     />
   );
@@ -148,7 +150,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     <Layout style={{ minHeight: "100vh" }}>
       <AdminTopBar key={options.title} onToggleMenu={handleToggleMenu} />
       <Layout>
-        <Sider className="!hidden md:!flex" width={220} collapsed={collapsed} collapsedWidth={64} theme="light">
+        <Sider className="!hidden md:!block" width={240} collapsed={collapsed} collapsedWidth={72} theme="dark">
           {menu}
         </Sider>
         <Content className="p-4 md:p-8">{children}</Content>
@@ -159,7 +161,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         open={isMobile && drawerOpen}
         onClose={() => setDrawerOpen(false)}
         size={240}
-        styles={{ body: { padding: 0 } }}
+        styles={{ body: { padding: 0, background: PALETTE.forest }, header: { background: PALETTE.forest, color: PALETTE.cream } }}
       >
         {menu}
       </Drawer>
