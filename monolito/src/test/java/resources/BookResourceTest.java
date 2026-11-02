@@ -38,29 +38,15 @@ public class BookResourceTest {
     BookService bookService;
 
     @Test
-    void listaPrimeraPaginaDeLibrosPorDefecto() {
+    void listaTodosLosLibros() {
         when(bookService.getBooks()).thenReturn(BOOKS_MOCK);
 
         given()
                 .when().get("/libros")
                 .then()
                 .statusCode(200)
-                .body("size()", is(10))
+                .body("size()", is(12))
                 .body("[0].title", is("El Aleph"));
-    }
-
-    @Test
-    void listaLibrosConPaginadoCustom() {
-        when(bookService.getBooks()).thenReturn(BOOKS_MOCK);
-
-        given()
-                .queryParam("first", 10)
-                .queryParam("total", 5)
-                .when().get("/libros")
-                .then()
-                .statusCode(200)
-                .body("size()", is(2))
-                .body("[0].title", is("Operación Masacre"));
     }
 
     @Test

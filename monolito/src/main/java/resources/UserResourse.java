@@ -22,18 +22,8 @@ public class UserResourse {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<UserDTO> usuarios(
-            @QueryParam("first") int first, // Indice inicial
-            @QueryParam("total") int total // Cantidad de elementos
-    ) {
-        var personas = userService.getUsers();
-
-        total = total <= 0 ? 10 : total;
-        first = Math.max(first, 0);
-        int inicio = Math.min(first, personas.size());
-        int fin = Math.min(first + total, personas.size());
-
-        return personas.subList(inicio, fin);
+    public List<UserDTO> usuarios() {
+        return userService.getUsers();
     }
 
     @GET

@@ -22,18 +22,8 @@ public class BookResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<BookDTO> libros(
-            @QueryParam("first") int first, // Indice inicial
-            @QueryParam("total") int total // Cantidad de elementos
-    ) {
-        var libros = bookService.getBooks();
-
-        total = total <= 0 ? 10 : total;
-        first = Math.max(first, 0);
-        int inicio = Math.min(first, libros.size());
-        int fin = Math.min(first + total, libros.size());
-
-        return libros.subList(inicio, fin);
+    public List<BookDTO> libros() {
+        return bookService.getBooks();
     }
 
     @GET

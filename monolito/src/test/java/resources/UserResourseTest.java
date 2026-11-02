@@ -35,29 +35,15 @@ public class UserResourseTest {
     UserService userService;
 
     @Test
-    void listaElPrimerPaginaDeUsuariosPorDefecto() {
+    void listaTodosLosUsuarios() {
         when(userService.getUsers()).thenReturn(USERS_MOCK);
 
         given()
                 .when().get("/usuarios")
                 .then()
                 .statusCode(200)
-                .body("size()", is(10))
+                .body("size()", is(12))
                 .body("[0].nombre", is("Juan"));
-    }
-
-    @Test
-    void listaUsuariosConPaginadoCustom() {
-        when(userService.getUsers()).thenReturn(USERS_MOCK);
-
-        given()
-                .queryParam("first", 10)
-                .queryParam("total", 5)
-                .when().get("/usuarios")
-                .then()
-                .statusCode(200)
-                .body("size()", is(2))
-                .body("[0].nombre", is("Diego"));
     }
 
     @Test

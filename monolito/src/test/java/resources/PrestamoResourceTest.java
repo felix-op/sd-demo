@@ -1,5 +1,6 @@
 package resources;
 
+import dtos.PaginaDTO;
 import dtos.PrestamoDTO;
 import dtos.SimpleBookDTO;
 import dtos.SimpleStudentDTO;
@@ -37,20 +38,20 @@ public class PrestamoResourceTest {
 
     @Test
     void listaPrestamosSinFiltros() {
-        when(prestamoService.buscar(any(), any(), any(), any(), eq(0), eq(10))).thenReturn(List.of(PRESTAMO_MOCK));
+        when(prestamoService.buscar(any(), any(), any(), any(), eq(1), eq(10))).thenReturn(pagina(1, 10, 1));
 
         given()
                 .when().get("/prestamos")
                 .then()
                 .statusCode(200)
-                .body("size()", is(1))
-                .body("[0].libro.title", is("El Aleph"));
+                .body("items.size()", is(1))
+                .body("items[0].libro.title", is("El Aleph"));
     }
 
     @Test
     void listaPrestamosConFiltrosCombinados() {
-        when(prestamoService.buscar("a1", "u1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), 0, 10))
-                .thenReturn(List.of(PRESTAMO_MOCK));
+        when(prestamoService.buscar("a1", "u1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), 1, 10))
+                .thenReturn(pagina(1, 10, 1));
 
         given()
                 .queryParam("alumno", "a1")
@@ -60,20 +61,49 @@ public class PrestamoResourceTest {
                 .when().get("/prestamos")
                 .then()
                 .statusCode(200)
-                .body("size()", is(1));
+                .body("items.size()", is(1));
     }
 
     @Test
-    void listaPrestamosConPaginadoCustom() {
-        when(prestamoService.buscar(any(), any(), any(), any(), eq(10), eq(5))).thenReturn(List.of(PRESTAMO_MOCK));
+    void devuelveLosDatosDePaginadoEnLaRespuesta() {
+        when(prestamoService.buscar(any(), any(), any(), any(), eq(3), eq(5))).thenReturn(pagina(3, 5, 42));
 
         given()
-                .queryParam("first", 10)
-                .queryParam("total", 5)
+                .queryParam("pagina", 3)
+                .queryParam("porPagina", 5)
                 .when().get("/prestamos")
                 .then()
                 .statusCode(200)
-                .body("size()", is(1));
+                .body("pagina", is(3))
+                .body("porPagina", is(5))
+                .body("totalItems", is(42))
+                .body("totalPaginas", is(9));
+    }
+
+    @Test
+    void normalizaPaginaYTamanioInvalidos() {
+        when(prestamoService.buscar(any(), any(), any(), any(), eq(1), eq(10))).thenReturn(pagina(1, 10, 1));
+
+        given()
+                .queryParam("pagina", 0)
+                .queryParam("porPagina", -5)
+                .when().get("/prestamos")
+                .then()
+                .statusCode(200)
+                .body("pagina", is(1))
+                .body("porPagina", is(10));
+    }
+
+    @Test
+    void limitaElTamanioDePaginaAlMaximo() {
+        when(prestamoService.buscar(any(), any(), any(), any(), eq(1), eq(100))).thenReturn(pagina(1, 100, 1));
+
+        given()
+                .queryParam("porPagina", 5000)
+                .when().get("/prestamos")
+                .then()
+                .statusCode(200)
+                .body("porPagina", is(100));
     }
 
     @Test
@@ -176,5 +206,10 @@ public class PrestamoResourceTest {
                 .when().post("/prestamos/p1/devolucion")
                 .then()
                 .statusCode(409);
+    }
+
+    private static PaginaDTO<PrestamoDTO> pagina(int pagina, int porPagina, long totalItems) {
+        int totalPaginas = (int) Math.ceil((double) totalItems / porPagina);
+        return new PaginaDTO<>(List.of(PRESTAMO_MOCK), pagina, porPagina, totalItems, totalPaginas);
     }
 }

@@ -22,18 +22,8 @@ public class StudentResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<StudentDTO> alumnos(
-            @QueryParam("first") int first, // Indice inicial
-            @QueryParam("total") int total // Cantidad de elementos
-    ) {
-        var estudiantes = studentService.getStudents();
-
-        total = total <= 0 ? 10 : total;
-        first = Math.max(first, 0);
-        int inicio = Math.min(first, estudiantes.size());
-        int fin = Math.min(first + total, estudiantes.size());
-
-        return estudiantes.subList(inicio, fin);
+    public List<StudentDTO> alumnos() {
+        return studentService.getStudents();
     }
 
     @GET

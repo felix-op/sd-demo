@@ -38,29 +38,15 @@ public class StudentResourceTest {
     StudentService studentService;
 
     @Test
-    void listaPrimeraPaginaDeAlumnosPorDefecto() {
+    void listaTodosLosAlumnos() {
         when(studentService.getStudents()).thenReturn(STUDENTS_MOCK);
 
         given()
                 .when().get("/alumnos")
                 .then()
                 .statusCode(200)
-                .body("size()", is(10))
+                .body("size()", is(12))
                 .body("[0].firstName", is("Juan"));
-    }
-
-    @Test
-    void listaAlumnosConPaginadoCustom() {
-        when(studentService.getStudents()).thenReturn(STUDENTS_MOCK);
-
-        given()
-                .queryParam("first", 10)
-                .queryParam("total", 5)
-                .when().get("/alumnos")
-                .then()
-                .statusCode(200)
-                .body("size()", is(2))
-                .body("[0].firstName", is("Diego"));
     }
 
     @Test

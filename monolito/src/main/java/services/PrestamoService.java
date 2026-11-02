@@ -1,11 +1,13 @@
 package services;
 
+import dtos.PaginaDTO;
 import dtos.PrestamoCreateDTO;
 import dtos.PrestamoDTO;
 import dtos.SimpleBookDTO;
 import dtos.SimpleStudentDTO;
 import dtos.SimpleUserDTO;
 import exceptions.ConflictException;
+import io.quarkus.panache.common.Page;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -16,7 +18,6 @@ import repositories.StudentRepository;
 import repositories.UserRepository;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,13 +40,18 @@ public class PrestamoService {
     @Inject
     BookRepository bookRepository;
 
-    public List<PrestamoDTO> buscar(String alumno, String atendidoPor, LocalDate fechaInicio, LocalDate fechaFin, int first, int total) {
+    public PaginaDTO<PrestamoDTO> buscar(String alumno, String atendidoPor, LocalDate fechaInicio, LocalDate fechaFin, int pagina, int porPagina) {
         UUID alumnoUuid = alumno != null ? UUID.fromString(alumno) : null;
         UUID atendidoPorUuid = atendidoPor != null ? UUID.fromString(atendidoPor) : null;
 
-        return prestamoRepository.buscar(alumnoUuid, atendidoPorUuid, fechaInicio, fechaFin, first, total).stream()
+        var query = prestamoRepository.buscar(alumnoUuid, atendidoPorUuid, fechaInicio, fechaFin)
+                .page(Page.of(pagina - 1, porPagina));
+
+        var items = query.list().stream()
                 .map(PrestamoService::toDTO)
                 .toList();
+
+        return new PaginaDTO<>(items, pagina, porPagina, query.count(), query.pageCount());
     }
 
     public Optional<PrestamoDTO> getPrestamo(String uuid) {

@@ -1,6 +1,8 @@
 package repositories;
 
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
+import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import models.PrestamoModel;
 
@@ -24,7 +26,7 @@ public class PrestamoRepository implements PanacheRepositoryBase<PrestamoModel, 
         return count("student.uuid = ?1 and returnDate is null", studentUuid);
     }
 
-    public List<PrestamoModel> buscar(UUID alumno, UUID atendidoPor, LocalDate fechaInicio, LocalDate fechaFin, int first, int total) {
+    public PanacheQuery<PrestamoModel> buscar(UUID alumno, UUID atendidoPor, LocalDate fechaInicio, LocalDate fechaFin) {
         var condiciones = new StringBuilder("1 = 1");
         var params = new HashMap<String, Object>();
 
@@ -48,8 +50,7 @@ public class PrestamoRepository implements PanacheRepositoryBase<PrestamoModel, 
             params.put("fechaFin", fechaFin);
         }
 
-        return find(condiciones.toString(), params)
-                .range(first, first + total - 1)
-                .list();
+        // Orden total (uuid desempata) para que el paginado sea estable entre páginas
+        return find(condiciones.toString(), Sort.descending("startDate").and("uuid"), params);
     }
 }

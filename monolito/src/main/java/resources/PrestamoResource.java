@@ -1,5 +1,6 @@
 package resources;
 
+import dtos.PaginaDTO;
 import dtos.PrestamoCreateDTO;
 import dtos.PrestamoDTO;
 import jakarta.inject.Inject;
@@ -10,11 +11,13 @@ import services.PrestamoService;
 import services.Rfc7807Service;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Path("/prestamos")
 public class PrestamoResource {
+
+    private static final int PORPAGINA_DEFECTO = 10;
+    private static final int PORPAGINA_MAXIMO = 100;
 
     @Inject
     PrestamoService prestamoService;
@@ -24,21 +27,21 @@ public class PrestamoResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<PrestamoDTO> prestamos(
+    public PaginaDTO<PrestamoDTO> prestamos(
             @QueryParam("alumno") String alumno,
             @QueryParam("atendidoPor") String atendidoPor,
             @QueryParam("fechaInicio") String fechaInicio,
             @QueryParam("fechaFin") String fechaFin,
-            @QueryParam("first") int first, // Indice inicial
-            @QueryParam("total") int total // Cantidad de elementos
+            @QueryParam("pagina") int pagina, // Página actual, empieza en 1
+            @QueryParam("porPagina") int porPagina // Cantidad de elementos por página
     ) {
         var inicio = (fechaInicio == null || fechaInicio.isBlank()) ? null : LocalDate.parse(fechaInicio);
         var fin = (fechaFin == null || fechaFin.isBlank()) ? null : LocalDate.parse(fechaFin);
 
-        total = total <= 0 ? 10 : total;
-        first = Math.max(first, 0);
+        pagina = Math.max(pagina, 1);
+        porPagina = porPagina <= 0 ? PORPAGINA_DEFECTO : Math.min(porPagina, PORPAGINA_MAXIMO);
 
-        return prestamoService.buscar(alumno, atendidoPor, inicio, fin, first, total);
+        return prestamoService.buscar(alumno, atendidoPor, inicio, fin, pagina, porPagina);
     }
 
     @GET
