@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -108,6 +109,19 @@ public class StudentResourceTest {
     }
 
     @Test
+    void rechazaCrearAlumnoConNombreDemasiadoLargo() {
+        given()
+                .contentType("application/json")
+                .body("{\"firstName\":\"" + "a".repeat(256) + "\",\"document\":\"999\"}")
+                .when().post("/alumnos")
+                .then()
+                .statusCode(400)
+                .body("title", is("Campo demasiado largo"))
+                .body("details", containsString("'firstName'"))
+                .body("details", containsString("255"));
+    }
+
+    @Test
     void actualizaAlumnoExistenteDevuelve200() {
         when(studentService.updateStudent(eq("3"), any())).thenReturn(Optional.of(alumno("3", "María", "Lopez Revisado")));
 
@@ -153,6 +167,6 @@ public class StudentResourceTest {
     }
 
     private static StudentDTO alumno(String uuid, String firstName, String lastName) {
-        return new StudentDTO(uuid, firstName, lastName, LocalDate.of(2000, 1, 1), "doc-" + uuid, List.of());
+        return new StudentDTO(uuid, firstName, lastName, LocalDate.of(2000, 1, 1), "doc-" + uuid);
     }
 }

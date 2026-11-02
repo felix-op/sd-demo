@@ -84,6 +84,11 @@ public class BookResource {
             return rfc7807Service.badRequest("No se encontró el autor", "El campo 'author' es obligatorio", instance);
         }
 
+        var exceso = Validaciones.primerExceso("title", dto.title(), "author", dto.author());
+        if (exceso != null) {
+            return rfc7807Service.badRequest("Campo demasiado largo", exceso, instance);
+        }
+
         return null;
     }
 }

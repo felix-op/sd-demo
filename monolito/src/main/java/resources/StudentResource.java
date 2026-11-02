@@ -84,6 +84,11 @@ public class StudentResource {
             return rfc7807Service.badRequest("No se encontró el documento", "El campo 'document' es obligatorio", instance);
         }
 
+        var exceso = Validaciones.primerExceso("firstName", dto.firstName(), "lastName", dto.lastName(), "document", dto.document());
+        if (exceso != null) {
+            return rfc7807Service.badRequest("Campo demasiado largo", exceso, instance);
+        }
+
         return null;
     }
 }

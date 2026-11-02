@@ -9,6 +9,7 @@ import models.PrestamoModel;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -16,6 +17,12 @@ public class PrestamoRepository implements PanacheRepositoryBase<PrestamoModel, 
 
     public List<PrestamoModel> findActiveByBook(UUID bookUuid) {
         return list("book.uuid = ?1 and returnDate is null", bookUuid);
+    }
+
+    public Set<UUID> uuidsLibrosPrestados() {
+        return Set.copyOf(getEntityManager()
+                .createQuery("select p.book.uuid from PrestamoModel p where p.returnDate is null", UUID.class)
+                .getResultList());
     }
 
     public List<PrestamoModel> findActiveByStudent(UUID studentUuid) {

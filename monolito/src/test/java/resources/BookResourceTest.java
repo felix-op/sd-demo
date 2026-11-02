@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -47,6 +48,19 @@ public class BookResourceTest {
                 .statusCode(200)
                 .body("size()", is(12))
                 .body("[0].title", is("El Aleph"));
+    }
+
+    @Test
+    void rechazaCrearLibroConTituloDemasiadoLargo() {
+        given()
+                .contentType("application/json")
+                .body("{\"title\":\"" + "a".repeat(256) + "\",\"author\":\"Borges\"}")
+                .when().post("/libros")
+                .then()
+                .statusCode(400)
+                .body("title", is("Campo demasiado largo"))
+                .body("details", containsString("'title'"))
+                .body("details", containsString("255"));
     }
 
     @Test
