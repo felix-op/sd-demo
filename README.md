@@ -31,6 +31,24 @@ Para probar el build empaquetado (jar real, sin hot-reload) contra la misma base
 docker compose -f docker-compose.dev.yml up -d --build app
 ```
 
+## Backup de la base de datos (dev)
+
+Generar un backup (`.sql` plano) de la base de desarrollo:
+
+```shell script
+set -a; source .env; set +a
+docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" demo-db-1 pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --no-owner --no-privileges > backups/dev.sql
+```
+
+Restaurarlo sobre la base (sobreescribe los datos actuales):
+
+```shell script
+set -a; source .env; set +a
+cat backups/dev.sql | docker exec -i -e PGPASSWORD="$POSTGRES_PASSWORD" demo-db-1 psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+```
+
+`backups/` está en `.gitignore` (puede contener datos reales), así que estos dumps no se versionan.
+
 ## Empaquetado
 
 ```shell script

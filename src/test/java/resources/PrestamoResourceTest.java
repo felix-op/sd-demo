@@ -17,6 +17,7 @@ import java.util.Optional;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @QuarkusTest
@@ -36,7 +37,7 @@ public class PrestamoResourceTest {
 
     @Test
     void listaPrestamosSinFiltros() {
-        when(prestamoService.buscar(any(), any(), any(), any())).thenReturn(List.of(PRESTAMO_MOCK));
+        when(prestamoService.buscar(any(), any(), any(), any(), eq(0), eq(10))).thenReturn(List.of(PRESTAMO_MOCK));
 
         given()
                 .when().get("/prestamos")
@@ -48,7 +49,7 @@ public class PrestamoResourceTest {
 
     @Test
     void listaPrestamosConFiltrosCombinados() {
-        when(prestamoService.buscar("a1", "u1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31)))
+        when(prestamoService.buscar("a1", "u1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), 0, 10))
                 .thenReturn(List.of(PRESTAMO_MOCK));
 
         given()
@@ -56,6 +57,19 @@ public class PrestamoResourceTest {
                 .queryParam("atendidoPor", "u1")
                 .queryParam("fechaInicio", "2026-01-01")
                 .queryParam("fechaFin", "2026-01-31")
+                .when().get("/prestamos")
+                .then()
+                .statusCode(200)
+                .body("size()", is(1));
+    }
+
+    @Test
+    void listaPrestamosConPaginadoCustom() {
+        when(prestamoService.buscar(any(), any(), any(), any(), eq(10), eq(5))).thenReturn(List.of(PRESTAMO_MOCK));
+
+        given()
+                .queryParam("first", 10)
+                .queryParam("total", 5)
                 .when().get("/prestamos")
                 .then()
                 .statusCode(200)
@@ -145,7 +159,7 @@ public class PrestamoResourceTest {
     void marcaDevolucionDevuelve200() {
         var devuelto = new PrestamoDTO("p1", ALUMNO, USUARIO, LIBRO,
                 LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 8), LocalDate.of(2026, 1, 5));
-        when(prestamoService.devolver("p1")).thenReturn(devuelto);
+        when(prestamoService.devolver(eq("p1"), any())).thenReturn(devuelto);
 
         given()
                 .when().post("/prestamos/p1/devolucion")
@@ -156,7 +170,7 @@ public class PrestamoResourceTest {
 
     @Test
     void devuelve409SiElPrestamoYaFueDevuelto() {
-        when(prestamoService.devolver("p1")).thenThrow(new ConflictException("El préstamo ya fue devuelto"));
+        when(prestamoService.devolver(eq("p1"), any())).thenThrow(new ConflictException("El préstamo ya fue devuelto"));
 
         given()
                 .when().post("/prestamos/p1/devolucion")

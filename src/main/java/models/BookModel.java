@@ -1,6 +1,7 @@
 package models;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,5 +25,6 @@ public class BookModel extends PanacheEntityBase {
 
     public LocalDate pubDate;
 
+    @Column(columnDefinition = "TEXT")
     public String description;
 }

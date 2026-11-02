@@ -39,11 +39,11 @@ public class PrestamoService {
     @Inject
     BookRepository bookRepository;
 
-    public List<PrestamoDTO> buscar(String alumno, String atendidoPor, LocalDate fechaInicio, LocalDate fechaFin) {
+    public List<PrestamoDTO> buscar(String alumno, String atendidoPor, LocalDate fechaInicio, LocalDate fechaFin, int first, int total) {
         UUID alumnoUuid = alumno != null ? UUID.fromString(alumno) : null;
         UUID atendidoPorUuid = atendidoPor != null ? UUID.fromString(atendidoPor) : null;
 
-        return prestamoRepository.buscar(alumnoUuid, atendidoPorUuid, fechaInicio, fechaFin).stream()
+        return prestamoRepository.buscar(alumnoUuid, atendidoPorUuid, fechaInicio, fechaFin, first, total).stream()
                 .map(PrestamoService::toDTO)
                 .toList();
     }
@@ -74,14 +74,14 @@ public class PrestamoService {
         prestamo.student = student;
         prestamo.attendedBy = user;
         prestamo.book = book;
-        prestamo.startDate = LocalDate.now();
+        prestamo.startDate = dto.fechaInicio() != null ? dto.fechaInicio() : LocalDate.now();
         prestamo.dueDate = prestamo.startDate.plusDays(DURACION_DIAS);
         prestamoRepository.persist(prestamo);
         return toDTO(prestamo);
     }
 
     @Transactional
-    public PrestamoDTO devolver(String uuid) {
+    public PrestamoDTO devolver(String uuid, LocalDate fecha) {
         var prestamo = prestamoRepository.findByIdOptional(UUID.fromString(uuid))
                 .orElseThrow(() -> new NoSuchElementException("No se encontró el préstamo con uuid " + uuid));
 
@@ -89,7 +89,7 @@ public class PrestamoService {
             throw new ConflictException("El préstamo ya fue devuelto");
         }
 
-        prestamo.returnDate = LocalDate.now();
+        prestamo.returnDate = fecha != null ? fecha : LocalDate.now();
         return toDTO(prestamo);
     }
 

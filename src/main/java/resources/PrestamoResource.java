@@ -28,12 +28,17 @@ public class PrestamoResource {
             @QueryParam("alumno") String alumno,
             @QueryParam("atendidoPor") String atendidoPor,
             @QueryParam("fechaInicio") String fechaInicio,
-            @QueryParam("fechaFin") String fechaFin
+            @QueryParam("fechaFin") String fechaFin,
+            @QueryParam("first") int first, // Indice inicial
+            @QueryParam("total") int total // Cantidad de elementos
     ) {
         var inicio = (fechaInicio == null || fechaInicio.isBlank()) ? null : LocalDate.parse(fechaInicio);
         var fin = (fechaFin == null || fechaFin.isBlank()) ? null : LocalDate.parse(fechaFin);
 
-        return prestamoService.buscar(alumno, atendidoPor, inicio, fin);
+        total = total <= 0 ? 10 : total;
+        first = Math.max(first, 0);
+
+        return prestamoService.buscar(alumno, atendidoPor, inicio, fin, first, total);
     }
 
     @GET
@@ -60,8 +65,9 @@ public class PrestamoResource {
     @POST
     @Path("/{uuid}/devolucion")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response devolver(@PathParam("uuid") String uuid) {
-        return Response.ok(prestamoService.devolver(uuid)).build();
+    public Response devolver(@PathParam("uuid") String uuid, @QueryParam("fecha") String fecha) {
+        var fechaDevolucion = (fecha == null || fecha.isBlank()) ? null : LocalDate.parse(fecha);
+        return Response.ok(prestamoService.devolver(uuid, fechaDevolucion)).build();
     }
 
     private Response validar(PrestamoCreateDTO dto) {

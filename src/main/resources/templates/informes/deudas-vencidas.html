@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Informe de Biblioteca</title>
+<style>
+    /* OpenHTMLToPDF soporta un subconjunto de CSS 2.1/3 - nada de flexbox/grid */
+    @page {
+        size: A4;
+        margin: 28mm 24mm;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Helvetica, Arial, sans-serif;
+        color: #1f2933;
+        margin: 0;
+    }
+
+    header {
+        border-bottom: 3px solid #1b4965;
+        padding-bottom: 12px;
+        margin-bottom: 18px;
+    }
+
+    header h1 {
+        margin: 0 0 4px 0;
+        font-size: 22pt;
+        color: #1b4965;
+    }
+
+    header h2 {
+        margin: 0;
+        font-size: 12pt;
+        font-weight: normal;
+        color: #52606d;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9pt;
+    }
+
+    thead th {
+        background-color: #1b4965;
+        color: #ffffff;
+        text-align: left;
+        padding: 8px 6px;
+        font-size: 8.5pt;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    tbody td {
+        padding: 7px 6px;
+        border-bottom: 1px solid #d9e2ec;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #f0f4f8;
+    }
+
+    td.dias-retraso {
+        font-weight: bold;
+        font-size: 11pt;
+        color: #b1123e;
+        text-align: right;
+    }
+
+    td.fecha {
+        white-space: nowrap;
+    }
+
+    footer {
+        margin-top: 16px;
+        font-size: 7.5pt;
+        color: #829ab1;
+        text-align: right;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Informe de Biblioteca</h1>
+    <h2>Deudas Vencidas · 06/05/2026 - 02/11/2026 · Periodo de 180 días</h2>
+</header>
+
+<table>
+    <thead>
+    <tr>
+        <th>Libro</th>
+        <th>Autor</th>
+        <th>Alumno</th>
+        <th>Documento</th>
+        <th>Fecha del Préstamo</th>
+        <th>Fecha de Vencimiento</th>
+        <th>Días de Retraso</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Alice's Adventures in Wonderland</td>
+        <td>Carroll, Lewis</td>
+        <td>Elouan Charles</td>
+        <td>50000002</td>
+        <td class="fecha">06/07/2026</td>
+        <td class="fecha">13/07/2026</td>
+        <td class="dias-retraso">112</td>
+    </tr>
+    <tr>
+        <td>The Blue Castle: a novel</td>
+        <td>Montgomery, L. M.</td>
+        <td>Camilla Rossi</td>
+        <td>50000019</td>
+        <td class="fecha">19/07/2026</td>
+        <td class="fecha">26/07/2026</td>
+        <td class="dias-retraso">99</td>
+    </tr>
+    <tr>
+        <td>The Adventures of Sherlock Holmes</td>
+        <td>Doyle, Arthur Conan</td>
+        <td>Bryan Fernandez</td>
+        <td>50000031</td>
+        <td class="fecha">03/07/2026</td>
+        <td class="fecha">10/07/2026</td>
+        <td class="dias-retraso">118</td>
+    </tr>
+    <tr>
+        <td>Ficciones</td>
+        <td>Borges, Jorge Luis</td>
+        <td>Ana Gomez</td>
+        <td>111</td>
+        <td class="fecha">12/08/2026</td>
+        <td class="fecha">19/08/2026</td>
+        <td class="dias-retraso">75</td>
+    </tr>
+    </tbody>
+</table>
+
+<footer>
+    Generado el 02/11/2026
+</footer>
+
+</body>
+</html>

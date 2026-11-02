@@ -24,7 +24,7 @@ public class PrestamoRepository implements PanacheRepositoryBase<PrestamoModel, 
         return count("student.uuid = ?1 and returnDate is null", studentUuid);
     }
 
-    public List<PrestamoModel> buscar(UUID alumno, UUID atendidoPor, LocalDate fechaInicio, LocalDate fechaFin) {
+    public List<PrestamoModel> buscar(UUID alumno, UUID atendidoPor, LocalDate fechaInicio, LocalDate fechaFin, int first, int total) {
         var condiciones = new StringBuilder("1 = 1");
         var params = new HashMap<String, Object>();
 
@@ -48,6 +48,8 @@ public class PrestamoRepository implements PanacheRepositoryBase<PrestamoModel, 
             params.put("fechaFin", fechaFin);
         }
 
-        return list(condiciones.toString(), params);
+        return find(condiciones.toString(), params)
+                .range(first, first + total - 1)
+                .list();
     }
 }
