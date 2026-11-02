@@ -1,4 +1,8 @@
 package dtos;
 
-public record UserDTO(String uuid, String name, String password) {
+public record UserDTO(
+        String uuid,
+        String nombre,
+        String documento
+) {
 }
