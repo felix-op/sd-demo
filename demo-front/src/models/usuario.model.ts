@@ -4,6 +4,11 @@ export interface Usuario {
   documento: string;
 }
 
+export interface UsuarioInput {
+  nombre: string;
+  documento: string;
+}
+
 export interface SimpleUsuario {
   uuid: string;
   nombre: string;

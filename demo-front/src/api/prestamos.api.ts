@@ -1,10 +1,13 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { requestFn, toQueryString } from "@/lib/request";
+import type { Page } from "@/models/pagination.model";
 import type { Prestamo, PrestamoCreate } from "@/models/prestamo.model";
 
 const BASE_PATH = "/prestamos";
 
-interface PrestamosListParams {
+export interface PrestamosListParams {
+  pagina?: number;
+  porPagina?: number;
   alumno?: string;
   atendidoPor?: string;
   fechaInicio?: string;
@@ -22,7 +25,9 @@ const prestamosKeys = {
 export function useGetPrestamos(params: PrestamosListParams = {}) {
   return useQuery({
     queryKey: prestamosKeys.list(params),
-    queryFn: () => requestFn<Prestamo[]>(`${BASE_PATH}${toQueryString(params)}`),
+    queryFn: () => requestFn<Page<Prestamo>>(`${BASE_PATH}${toQueryString(params)}`),
+    // Mantiene la página anterior visible mientras llega la siguiente (evita parpadeos al paginar/filtrar).
+    placeholderData: keepPreviousData,
   });
 }
 

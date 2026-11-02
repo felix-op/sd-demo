@@ -3,13 +3,22 @@
 import { Button, Dropdown, theme, type MenuProps } from "antd";
 import { DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined } from "@ant-design/icons";
 
+export interface EntityExtraAction {
+  key: string;
+  label: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+}
+
 interface EntityActionsMenuProps {
   onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  /** Acciones adicionales, mostradas entre "Editar" y "Eliminar". */
+  extraActions?: EntityExtraAction[];
 }
 
-export function EntityActionsMenu({ onView, onEdit, onDelete }: EntityActionsMenuProps) {
+export function EntityActionsMenu({ onView, onEdit, onDelete, extraActions = [] }: EntityActionsMenuProps) {
   const { token } = theme.useToken();
 
   const iconStyle = { fontSize: 16 };
@@ -29,6 +38,7 @@ export function EntityActionsMenu({ onView, onEdit, onDelete }: EntityActionsMen
           icon: <EditOutlined style={{ ...iconStyle, color: token.colorSuccess }} />,
         }
       : null,
+    ...extraActions.map(({ key, label, icon }) => ({ key, label, icon })),
     onDelete
       ? {
           key: "delete",
@@ -43,6 +53,7 @@ export function EntityActionsMenu({ onView, onEdit, onDelete }: EntityActionsMen
     if (key === "view") onView?.();
     else if (key === "edit") onEdit?.();
     else if (key === "delete") onDelete?.();
+    else extraActions.find((action) => action.key === key)?.onClick();
   }
 
   return (

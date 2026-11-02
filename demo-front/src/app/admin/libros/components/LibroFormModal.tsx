@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { App, DatePicker, Form, Input, InputNumber, Modal } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
 import { usePostLibro, usePutLibro } from "@/api/libros.api";
-import { getErrorInfo } from "@/lib/request";
+import { useErrorMessage } from "@/lib/use-error-message";
 import type { Libro, LibroInput } from "@/models/libro.model";
 
 interface LibroFormModalProps {
@@ -24,6 +24,7 @@ interface FormValues {
 export function LibroFormModal({ open, libro, onClose }: LibroFormModalProps) {
   const [form] = Form.useForm<FormValues>();
   const { message } = App.useApp();
+  const showError = useErrorMessage();
   const createMutation = usePostLibro();
   const updateMutation = usePutLibro();
   const isEdit = Boolean(libro);
@@ -64,8 +65,7 @@ export function LibroFormModal({ open, libro, onClose }: LibroFormModalProps) {
       }
       onClose();
     } catch (error) {
-      const { title, detail } = getErrorInfo(error);
-      message.error(detail ? `${title}: ${detail}` : title);
+      showError(error);
     }
   }
 
@@ -81,18 +81,16 @@ export function LibroFormModal({ open, libro, onClose }: LibroFormModalProps) {
       centered
       destroyOnHidden
     >
-      <Form form={form} layout="vertical" requiredMark="optional">
+      <Form form={form} layout="vertical" validateTrigger={["onChange", "onBlur"]}>
         <Form.Item
           label="Título"
           name="title"
-          rules={[{ required: true, message: "El título es obligatorio." }]}
         >
           <Input placeholder="Ej: Cien años de soledad" />
         </Form.Item>
         <Form.Item
           label="Autor"
           name="author"
-          rules={[{ required: true, message: "El autor es obligatorio." }]}
         >
           <Input placeholder="Ej: Gabriel García Márquez" />
         </Form.Item>

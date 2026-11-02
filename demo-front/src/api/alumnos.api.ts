@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { requestFn, toQueryString } from "@/lib/request";
-import type { Alumno } from "@/models/alumno.model";
+import type { Alumno, AlumnoInput } from "@/models/alumno.model";
 
 const BASE_PATH = "/alumnos";
 
@@ -36,7 +36,7 @@ export function usePostAlumno() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (alumno: Alumno) => requestFn<Alumno>(BASE_PATH, { method: "POST", body: alumno }),
+    mutationFn: (alumno: AlumnoInput) => requestFn<Alumno>(BASE_PATH, { method: "POST", body: alumno }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: alumnosKeys.lists() });
     },
@@ -47,7 +47,7 @@ export function usePutAlumno() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ uuid, alumno }: { uuid: string; alumno: Alumno }) =>
+    mutationFn: ({ uuid, alumno }: { uuid: string; alumno: AlumnoInput }) =>
       requestFn<Alumno>(`${BASE_PATH}/${uuid}`, { method: "PUT", body: alumno }),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: alumnosKeys.lists() });

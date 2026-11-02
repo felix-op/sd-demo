@@ -2,7 +2,7 @@
 
 import { App, Modal, Typography } from "antd";
 import { useDeleteLibro } from "@/api/libros.api";
-import { getErrorInfo } from "@/lib/request";
+import { useErrorMessage } from "@/lib/use-error-message";
 import type { Libro } from "@/models/libro.model";
 
 const { Text } = Typography;
@@ -15,6 +15,7 @@ interface LibroDeleteModalProps {
 
 export function LibroDeleteModal({ open, libro, onClose }: LibroDeleteModalProps) {
   const { message } = App.useApp();
+  const showError = useErrorMessage();
   const deleteMutation = useDeleteLibro();
 
   async function handleConfirm() {
@@ -24,8 +25,7 @@ export function LibroDeleteModal({ open, libro, onClose }: LibroDeleteModalProps
       message.success("Libro eliminado correctamente.");
       onClose();
     } catch (error) {
-      const { title, detail } = getErrorInfo(error);
-      message.error(detail ? `${title}: ${detail}` : title);
+      showError(error);
     }
   }
 

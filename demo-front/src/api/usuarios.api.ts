@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { requestFn, toQueryString } from "@/lib/request";
-import type { Usuario } from "@/models/usuario.model";
+import type { Usuario, UsuarioInput } from "@/models/usuario.model";
 
 const BASE_PATH = "/usuarios";
 
@@ -36,7 +36,7 @@ export function usePostUsuario() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (usuario: Usuario) => requestFn<Usuario>(BASE_PATH, { method: "POST", body: usuario }),
+    mutationFn: (usuario: UsuarioInput) => requestFn<Usuario>(BASE_PATH, { method: "POST", body: usuario }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: usuariosKeys.lists() });
     },
@@ -47,7 +47,7 @@ export function usePutUsuario() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ uuid, usuario }: { uuid: string; usuario: Usuario }) =>
+    mutationFn: ({ uuid, usuario }: { uuid: string; usuario: UsuarioInput }) =>
       requestFn<Usuario>(`${BASE_PATH}/${uuid}`, { method: "PUT", body: usuario }),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: usuariosKeys.lists() });
