@@ -1,10 +1,12 @@
 package services;
 
+import dtos.SimpleBookDTO;
 import dtos.StudentDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import models.StudentModel;
+import repositories.PrestamoRepository;
 import repositories.StudentRepository;
 
 import java.util.List;
@@ -17,15 +19,18 @@ public class StudentService {
     @Inject
     StudentRepository studentRepository;
 
+    @Inject
+    PrestamoRepository prestamoRepository;
+
     public List<StudentDTO> getStudents() {
         return studentRepository.listAll().stream()
-                .map(StudentService::toDTO)
+                .map(this::toDTO)
                 .toList();
     }
 
     public Optional<StudentDTO> getStudent(String uuid) {
         return studentRepository.findByIdOptional(UUID.fromString(uuid))
-                .map(StudentService::toDTO);
+                .map(this::toDTO);
     }
 
     @Transactional
@@ -56,13 +61,21 @@ public class StudentService {
         return studentRepository.deleteById(UUID.fromString(uuid));
     }
 
-    public static StudentDTO toDTO(StudentModel studentModel) {
+    public StudentDTO toDTO(StudentModel studentModel) {
+        var librosPrestados = prestamoRepository.findActiveByStudent(studentModel.uuid).stream()
+                .map(prestamo -> new SimpleBookDTO(
+                        prestamo.book.uuid.toString(),
+                        prestamo.book.title
+                ))
+                .toList();
+
         return new StudentDTO(
                 studentModel.uuid.toString(),
                 studentModel.firstName,
                 studentModel.lastName,
                 studentModel.birthday,
-                studentModel.documentId
+                studentModel.documentId,
+                librosPrestados
         );
     }
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -19,5 +20,9 @@ public class BookModel extends PanacheEntityBase {
 
     public String author;
 
-    public boolean rented;
+    public int numPages;
+
+    public LocalDate pubDate;
+
+    public String description;
 }

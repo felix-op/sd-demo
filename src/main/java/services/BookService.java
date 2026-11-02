@@ -1,11 +1,13 @@
 package services;
 
 import dtos.BookDTO;
+import dtos.SimpleStudentDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import models.BookModel;
 import repositories.BookRepository;
+import repositories.PrestamoRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,15 +19,18 @@ public class BookService {
     @Inject
     BookRepository bookRepository;
 
+    @Inject
+    PrestamoRepository prestamoRepository;
+
     public List<BookDTO> getBooks() {
         return bookRepository.listAll().stream()
-                .map(BookService::toDTO)
+                .map(this::toDTO)
                 .toList();
     }
 
     public Optional<BookDTO> getBook(String uuid) {
         return bookRepository.findByIdOptional(UUID.fromString(uuid))
-                .map(BookService::toDTO);
+                .map(this::toDTO);
     }
 
     @Transactional
@@ -33,7 +38,9 @@ public class BookService {
         var book = new BookModel();
         book.author = bookDTO.author();
         book.title = bookDTO.title();
-        book.rented = bookDTO.rented();
+        book.numPages = bookDTO.numPages();
+        book.pubDate = bookDTO.pubDate();
+        book.description = bookDTO.description();
         bookRepository.persist(book);
         return toDTO(book);
     }
@@ -44,7 +51,9 @@ public class BookService {
                 .map(book -> {
                     book.title = bookDTO.title();
                     book.author = bookDTO.author();
-                    book.rented = bookDTO.rented();
+                    book.numPages = bookDTO.numPages();
+                    book.pubDate = bookDTO.pubDate();
+                    book.description = bookDTO.description();
                     return toDTO(book);
                 });
     }
@@ -54,12 +63,25 @@ public class BookService {
         return bookRepository.deleteById(UUID.fromString(uuid));
     }
 
-    public static BookDTO toDTO(BookModel bookModel) {
+    public BookDTO toDTO(BookModel bookModel) {
+        var alumnosConPrestamo = prestamoRepository.findActiveByBook(bookModel.uuid).stream()
+                .map(prestamo -> new SimpleStudentDTO(
+                        prestamo.student.uuid.toString(),
+                        prestamo.student.documentId,
+                        prestamo.student.firstName,
+                        prestamo.student.lastName
+                ))
+                .toList();
+
         return new BookDTO(
                 bookModel.uuid.toString(),
                 bookModel.title,
                 bookModel.author,
-                bookModel.rented
+                !alumnosConPrestamo.isEmpty(),
+                bookModel.numPages,
+                bookModel.pubDate,
+                bookModel.description,
+                alumnosConPrestamo
         );
     }
 }
