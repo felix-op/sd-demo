@@ -28,6 +28,8 @@ http:
       rule: PathPrefix(`/monolito`)
       middlewares:
         - monolito-stripprefix
+        - traefik-timeout
+        - traefik-circuitbreaker
       service: monolito-service
       priority: 200
       tls: {}
@@ -38,6 +40,8 @@ http:
       rule: PathPrefix(`/microservicios/alumnos`) || PathPrefix(`/microservicios/usuarios`)
       middlewares:
         - microservicios-stripprefix
+        - traefik-timeout
+        - traefik-circuitbreaker
       service: personas-service
       priority: 200
       tls: {}
@@ -48,6 +52,8 @@ http:
       rule: PathPrefix(`/microservicios/libros`) || PathPrefix(`/microservicios/catalogos`) || PathPrefix(`/microservicios/prestamos`)
       middlewares:
         - microservicios-stripprefix
+        - traefik-timeout
+        - traefik-circuitbreaker
       service: prestamos-service
       priority: 200
       tls: {}
@@ -58,6 +64,8 @@ http:
       rule: PathPrefix(`/microservicios/informes`)
       middlewares:
         - microservicios-stripprefix
+        - traefik-timeout
+        - traefik-circuitbreaker
       service: monolito-service
       priority: 200
       tls: {}
@@ -80,6 +88,27 @@ http:
         prefixes:
           - "/microservicios"
 
+    # ==========================================
+    # 1. TIMEOUT EN TRAEFIK (vía Buffering)
+    # ==========================================
+    traefik-timeout:
+      buffering:
+        maxResponseBodyBytes: 1048576
+        memResponseBodyBytes: 2097152
+        maxRequestBodyBytes: 1048576
+        memRequestBodyBytes: 2097152
+        timeout: "2s"
+
+    # ==========================================
+    # 2. CIRCUIT BREAKER EN TRAEFIK
+    # ==========================================
+    traefik-circuitbreaker:
+      circuitBreaker:
+        expression: "ResponseCodeRatio(500, 600, 0, 600) > 0.5"
+        checkPeriod: "5s"
+        fallbackDuration: "10s"
+        recoveryDuration: "5s"
+
   services:
     prueba:
       loadBalancer:
@@ -100,11 +129,6 @@ http:
       loadBalancer:
         servers:
           - url: "http://10.0.3.3:8200"
-
-    # monolitolegado-service:
-    #   loadBalancer:
-    #     servers:
-    #       - url: "http://10.0.3.2:8080"
 
 # Rutas finales (cuando existan los servicios):
 #   publico: PathPrefix(`/catalogo`) && Method(`GET`) -> libros-prestamos en sdist1 y sdist2 (balanceado)

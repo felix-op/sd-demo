@@ -9,6 +9,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import services.InformeService;
 
 import java.time.LocalDate;
@@ -28,6 +29,12 @@ public class InformeResource {
             @QueryParam("fechaFin") String fechaFin,
             @QueryParam("estado") @DefaultValue("ambos") String estado // vencidos | noVencidos | ambos
     ) {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         var inicio = (fechaInicio == null || fechaInicio.isBlank()) ? LocalDate.MIN : LocalDate.parse(fechaInicio);
         var fin = (fechaFin == null || fechaFin.isBlank()) ? LocalDate.MAX : LocalDate.parse(fechaFin);
 
@@ -46,5 +53,12 @@ public class InformeResource {
         var fin = (fechaFin == null || fechaFin.isBlank()) ? LocalDate.MAX : LocalDate.parse(fechaFin);
 
         return informeService.atenciones(inicio, fin, atendidoPor);
+    }
+
+    @GET 
+    public Response informes() {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("{\"title\": \"Informe no implementado \", \"details\": \"Sólo existen /atenciones y /no-devueltos\", \"status\": \"500\", \"instance\": \"/informes\"}")
+                .build();
     }
 }
