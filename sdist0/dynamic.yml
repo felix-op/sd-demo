@@ -22,6 +22,46 @@ http:
       service: prueba
       tls: {}
 
+    # Router para el backend de Quarkus en sdist1
+    monolito-router:
+      entryPoints: [publico]
+      rule: PathPrefix(`/monolito`)
+      middlewares:
+        - monolito-stripprefix
+      service: monolito-service
+      priority: 200
+      tls: {}
+
+    # Router para el microservicio de personas en sdist1
+    personas-router:
+      entryPoints: [publico, privado]
+      rule: PathPrefix(`/microservicios/alumnos`) || PathPrefix(`/microservicios/usuarios`)
+      middlewares:
+        - microservicios-stripprefix
+      service: personas-service
+      priority: 200
+      tls: {}
+
+    # Router para el microservicio de prestamos en sdist2
+    prestamos-router:
+      entryPoints: [publico, privado]
+      rule: PathPrefix(`/microservicios/libros`) || PathPrefix(`/microservicios/catalogos`) || PathPrefix(`/microservicios/prestamos`)
+      middlewares:
+        - microservicios-stripprefix
+      service: prestamos-service
+      priority: 200
+      tls: {}
+
+    # Router para los servicios legados
+    monolitolegado-router:
+      entryPoints: [publico, privado]
+      rule: PathPrefix(`/microservicios/informes`)
+      middlewares:
+        - microservicios-stripprefix
+      service: monolito-service
+      priority: 200
+      tls: {}
+
     # Dashboard de Traefik, solo por la entrada privada
     dashboard:
       entryPoints: [privado]
@@ -30,11 +70,41 @@ http:
       priority: 100
       tls: {}
 
+  middlewares:
+    monolito-stripprefix:
+      stripPrefix:
+        prefixes:
+          - "/monolito"
+    microservicios-stripprefix:
+      stripPrefix:
+        prefixes:
+          - "/microservicios"
+
   services:
     prueba:
       loadBalancer:
         servers:
           - url: http://prueba:80
+          
+    monolito-service:
+      loadBalancer:
+        servers:
+          - url: "http://10.0.3.2:8080"
+
+    personas-service:
+      loadBalancer:
+        servers:
+          - url: "http://10.0.3.2:8100"
+
+    prestamos-service:
+      loadBalancer:
+        servers:
+          - url: "http://10.0.3.3:8200"
+
+    # monolitolegado-service:
+    #   loadBalancer:
+    #     servers:
+    #       - url: "http://10.0.3.2:8080"
 
 # Rutas finales (cuando existan los servicios):
 #   publico: PathPrefix(`/catalogo`) && Method(`GET`) -> libros-prestamos en sdist1 y sdist2 (balanceado)

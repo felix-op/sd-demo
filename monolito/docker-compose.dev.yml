@@ -17,10 +17,8 @@ services:
       retries: 10
 
   app:
-    build:
-      context: .
-      dockerfile: src/main/docker/Dockerfile.jvm
-    restart: "no"
+    image: felixop/sdmonolito:latest
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
@@ -28,8 +26,9 @@ services:
       QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
       QUARKUS_DATASOURCE_USERNAME: ${POSTGRES_USER}
       QUARKUS_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      QUARKUS_HTTP_PROXY_PROXY_ADDRESS_FORWARDING: "true"
     ports:
-      - "8080:8080"
+      - "0.0.0.0:8080:8080"
 
 volumes:
   db-dev-data:

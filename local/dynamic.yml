@@ -1,0 +1,78 @@
+http:
+  routers:
+    # Público: solo lectura (GET)
+    publico:
+      entryPoints: [publico]
+      rule: Method(`GET`)
+      service: noop
+      priority: 1
+
+    # Privado: todos los métodos
+    privado:
+      entryPoints: [privado]
+      rule: PathPrefix(`/`)
+      service: noop
+      priority: 1
+
+    # Dashboard de Traefik, solo por la entrada privada
+    dashboard:
+      entryPoints: [privado]
+      rule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+      service: api@internal
+      priority: 100
+
+    # Monolito
+    monolito-router:
+      entryPoints: [publico, privado]
+      rule: PathPrefix(`/monolito`)
+      middlewares:
+        - monolito-stripprefix
+      service: monolito-service
+      priority: 200
+
+    # Personas
+    personas-router:
+      entryPoints: [privado]
+      rule: PathPrefix(`/alumnos`) || PathPrefix(`/usuarios`)
+      service: personas-service
+      priority: 200
+
+    # Libros y Préstamos (privado: gestión; público: catálogo GET)
+    libros-prestamos-router-privado:
+      entryPoints: [privado]
+      rule: PathPrefix(`/libros`) || PathPrefix(`/prestamos`)
+      service: libros-prestamos-service
+      priority: 200
+
+    libros-prestamos-router-catalogo:
+      entryPoints: [publico]
+      rule: PathPrefix(`/catalogo`) && Method(`GET`)
+      service: libros-prestamos-service
+      priority: 200
+
+  middlewares:
+    monolito-stripprefix:
+      stripPrefix:
+        prefixes:
+          - "/monolito"
+
+  services:
+    # Servicio vacío para las reglas catch-all (sin backends reales)
+    noop:
+      loadBalancer:
+        servers: []
+
+    monolito-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:${MONOLITO_PORT:-8080}"
+
+    personas-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:${PERSONAS_PORT:-8100}"
+
+    libros-prestamos-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:${LIBROS_PRESTAMOS_PORT:-8200}"

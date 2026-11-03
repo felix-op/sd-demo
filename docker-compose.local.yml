@@ -1,0 +1,31 @@
+# local: Traefik local sin TLS, apunta a servicios corriendo en el host.
+# Los servicios (monolito, personas, libros-prestamos) deben estar levantados
+# localmente antes de arrancar esto.
+#
+# Entradas:
+#   :80    publico  -> lo que verían los alumnos (solo GET)
+#   :8080  privado  -> backoffice y dashboard (http://localhost:8080/dashboard/)
+#
+# Nota: host.docker.internal resuelve al host desde dentro del contenedor.
+#       En Linux puede requerir agregar extra_hosts (ya incluido abajo).
+services:
+  traefik:
+    image: traefik:v3.6
+    restart: unless-stopped
+    command:
+      - --entrypoints.publico.address=:80
+      - --entrypoints.privado.address=:8080
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --providers.file.filename=/etc/traefik/dynamic.yml
+      - --providers.file.watch=true
+      - --log.level=DEBUG
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - ./local/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
