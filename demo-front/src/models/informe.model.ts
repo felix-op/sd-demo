@@ -11,6 +11,8 @@ export interface InformeAtencion {
 export interface InformeNoDevuelto {
   alumno: SimpleAlumno;
   libro: SimpleLibro;
+  autor: string;
+  fechaPrestamo: string;
   fechaVencimiento: string;
   diasRetraso: number;
 }

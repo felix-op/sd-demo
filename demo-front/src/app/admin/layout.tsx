@@ -10,7 +10,7 @@ import {
   TeamOutlined,
   SwapOutlined,
   BarChartOutlined,
-  DashboardOutlined,
+  HomeOutlined,
   MenuOutlined,
   SearchOutlined,
   CloseOutlined,
@@ -23,7 +23,7 @@ const { Sider, Content } = Layout;
 const { useBreakpoint } = Grid;
 
 const NAV_ITEMS = [
-  { key: "/admin", icon: <DashboardOutlined style={{ fontSize: 22 }} />, label: <Link href="/admin">Resumen</Link> },
+  { key: "/admin", icon: <HomeOutlined style={{ fontSize: 22 }} />, label: <Link href="/admin">Inicio</Link> },
   { key: "/admin/usuarios", icon: <UserOutlined style={{ fontSize: 22 }} />, label: <Link href="/admin/usuarios">Usuarios</Link> },
   { key: "/admin/libros", icon: <BookOutlined style={{ fontSize: 22 }} />, label: <Link href="/admin/libros">Libros</Link> },
   { key: "/admin/alumnos", icon: <TeamOutlined style={{ fontSize: 22 }} />, label: <Link href="/admin/alumnos">Alumnos</Link> },
